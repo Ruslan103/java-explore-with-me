@@ -18,7 +18,7 @@ public interface HitRepository extends JpaRepository<Hit, Long> {
             "FROM Hit AS h " +
             "WHERE h.date>= ?1 AND h.date <= ?2 AND h.uri IN ?3 " +
             "GROUP BY h.app, h.uri "
-            )
+    )
     List<ViewStatsDto> getUniqueStatWithUris(LocalDateTime start,
                                              LocalDateTime end, List<String> uri);
 
@@ -26,7 +26,7 @@ public interface HitRepository extends JpaRepository<Hit, Long> {
     @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (DISTINCT h.ip)) " +
             "FROM Hit AS h " +
             "WHERE h.date >= ?1 AND h.date <= ?2 " +
-            "GROUP BY h.app, h.uri " )
+            "GROUP BY h.app, h.uri ")
     List<ViewStatsDto> getUniqueStats(LocalDateTime start,
                                       LocalDateTime end);
 

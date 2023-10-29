@@ -34,7 +34,7 @@ public class HitController {
             @RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
             @RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
             @RequestParam(defaultValue = "") List<String> uris,
-            @RequestParam (defaultValue = "false") boolean unique) {
+            @RequestParam(defaultValue = "false") boolean unique) {
         return service.getStats(start, end, uris, unique);
     }
 }
