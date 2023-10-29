@@ -10,11 +10,12 @@
     </parent>
 
     <groupId>ru.yandex.practicum</groupId>
-    <artifactId>stat-server</artifactId>
+    <artifactId>stats-server</artifactId>
     <packaging>pom</packaging>
     <modules>
         <module>stat-service</module>
         <module>stat-dto</module>
+        <module>stat-client</module>
     </modules>
 
 
