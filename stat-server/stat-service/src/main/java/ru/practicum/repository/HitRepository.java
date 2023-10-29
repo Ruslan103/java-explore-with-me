@@ -13,6 +13,34 @@ import java.util.List;
 @Repository
 public interface HitRepository extends JpaRepository<Hit, Long> {
 
+    // уникальные и со списком uri
+    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (h.ip)) " +
+            "FROM Hit AS h " +
+            "WHERE h.date>= ?1 AND h.date <= ?2 AND h.uri IN ?3 " +
+            "GROUP BY h.app, h.uri " +
+            "ORDER BY COUNT (DISTINCT h.ip) DESC")
+    List<ViewStatsDto> getUniqueStatWithUris(LocalDateTime start,
+                                             LocalDateTime end, List<String> uri);
+
+    //   уникальные, но без списка uri
+    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (h.ip)) " +
+            "FROM Hit AS h " +
+            "WHERE h.date >= ?1 AND h.date <= ?2 " +
+            "GROUP BY h.app, h.uri " +
+            "ORDER BY COUNT (DISTINCT h.ip) DESC")
+    List<ViewStatsDto> getUniqueStats(LocalDateTime start,
+                                      LocalDateTime end);
+
+    //   не уникальные, но без списка uri
+    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (h.ip)) " +
+            "FROM Hit AS h " +
+            "WHERE h.date >= ?1 AND h.date <= ?2 " +
+            "GROUP BY h.app, h.uri " +
+            "ORDER BY COUNT (h.ip) DESC ")
+    List<ViewStatsDto> getAllStats(LocalDateTime start,
+                                   LocalDateTime end);
+
+
     // неуникальные и со списком ури
     @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (h.ip)) " +
             "FROM Hit AS h " +
@@ -24,39 +52,4 @@ public interface HitRepository extends JpaRepository<Hit, Long> {
                                               List<String> uri);
 
 
-//    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (h.ip)) "
-//            + "FROM Hit AS h "
-//            + "WHERE h.date >= :start AND h.date <= :end AND h.uri IN :uris "
-//            + "GROUP BY h.app, h.uri "
-//            + "ORDER BY COUNT (h.ip) DESC ")
-//    List<ViewStatsDto> getStatsByUrisAndTimestamps(@Param("start") LocalDateTime start,
-//                                                   @Param("end") LocalDateTime end,
-//                                                   @Param("uris") List<String> uris);
-
-
-    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (h.ip)) " +
-            "FROM Hit AS h " +
-            "WHERE h.date>= ?1 AND h.date <= ?2 AND h.uri IN ?3 " +
-            "GROUP BY h.app, h.uri " +
-            "ORDER BY COUNT (DISTINCT h.ip) DESC")
-    List<ViewStatsDto> getUniqueStatWithUris(LocalDateTime start,
-                                             LocalDateTime end, List<String> uri);
-
-
-    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (h.ip)) " +
-            "FROM Hit AS h " +
-            "WHERE h.date >= ?1 AND h.date <= ?2 " +
-            "GROUP BY h.app, h.uri " +
-            "ORDER BY COUNT (h.ip) DESC ")
-    List<ViewStatsDto> getAllStats(LocalDateTime start,
-                                   LocalDateTime end);
-
-
-    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (h.ip)) " +
-            "FROM Hit AS h " +
-            "WHERE h.date >= ?1 AND h.date <= ?2 " +
-            "GROUP BY h.app, h.uri " +
-            "ORDER BY COUNT (DISTINCT h.ip) DESC")
-    List<ViewStatsDto> getUniqueStats(LocalDateTime start,
-                                      LocalDateTime end);
 }

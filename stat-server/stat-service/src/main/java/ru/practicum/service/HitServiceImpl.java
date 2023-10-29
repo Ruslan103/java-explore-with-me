@@ -35,19 +35,16 @@ public class HitServiceImpl implements HitService {
         List<ViewStatsDto> s;
         if (unique) {
             if (uris.isEmpty()) {
-                //   уникальные, но без списка uri
+
                 s = hitRepository.getUniqueStats(start, end);
             } else {
-                // уникальные и со списком uri
                 s = hitRepository.getUniqueStatWithUris(start, end, uris);
             }
         } else {
             if (uris.isEmpty()) {
-                //   не уникальные, но без списка uri
                 s = hitRepository.getAllStats(start, end);
 
             } else {
-                // неуникальные и со списком ури
                 s = hitRepository.getStatWithUrisAndDate(start, end, uris);
             }
         }
