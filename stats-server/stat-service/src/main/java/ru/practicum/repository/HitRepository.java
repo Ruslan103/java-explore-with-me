@@ -14,24 +14,23 @@ import java.util.List;
 public interface HitRepository extends JpaRepository<Hit, Long> {
 
     // уникальные и со списком uri
-    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (h.ip)) " +
+    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (DISTINCT h.ip)) " +
             "FROM Hit AS h " +
             "WHERE h.date>= ?1 AND h.date <= ?2 AND h.uri IN ?3 " +
-            "GROUP BY h.app, h.uri " +
-            "ORDER BY COUNT (DISTINCT h.ip) DESC")
+            "GROUP BY h.app, h.uri "
+            )
     List<ViewStatsDto> getUniqueStatWithUris(LocalDateTime start,
                                              LocalDateTime end, List<String> uri);
 
-    //   уникальные, но без списка uri
-    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (h.ip)) " +
+    //   уникальные и без списка uri
+    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (DISTINCT h.ip)) " +
             "FROM Hit AS h " +
             "WHERE h.date >= ?1 AND h.date <= ?2 " +
-            "GROUP BY h.app, h.uri " +
-            "ORDER BY COUNT (DISTINCT h.ip) DESC")
+            "GROUP BY h.app, h.uri " )
     List<ViewStatsDto> getUniqueStats(LocalDateTime start,
                                       LocalDateTime end);
 
-    //   не уникальные, но без списка uri
+    //   неуникальные и без списка uri
     @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (h.ip)) " +
             "FROM Hit AS h " +
             "WHERE h.date >= ?1 AND h.date <= ?2 " +
@@ -39,7 +38,6 @@ public interface HitRepository extends JpaRepository<Hit, Long> {
             "ORDER BY COUNT (h.ip) DESC ")
     List<ViewStatsDto> getAllStats(LocalDateTime start,
                                    LocalDateTime end);
-
 
     // неуникальные и со списком ури
     @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app,h.uri, COUNT (h.ip)) " +
@@ -50,6 +48,4 @@ public interface HitRepository extends JpaRepository<Hit, Long> {
     List<ViewStatsDto> getStatWithUrisAndDate(LocalDateTime start,
                                               LocalDateTime end,
                                               List<String> uri);
-
-
 }
