@@ -1,9 +1,9 @@
 version: '3.1'
 services:
-  stat-server:
-    build: stat-server/stats-service
-    image: stat-server
-    container_name: stat-server
+  stats-server:
+    build: stats-server/stat-service
+    image: stats-server
+    container_name: stats-server
     depends_on:
       - stat-db
     ports:
@@ -29,7 +29,7 @@ services:
     container_name: main-server
     depends_on:
       - main-db
-      - stat-server
+      - stats-server
     ports:
       - "8080:8080"
     environment:
