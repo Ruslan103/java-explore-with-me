@@ -10,7 +10,7 @@ public class HitMapper {
                 .ip(endpointHitDto.getIp())
                 .uri(endpointHitDto.getUri())
                 .app(endpointHitDto.getApp())
-                .timestamp(endpointHitDto.getTimestamp())
+                .date(endpointHitDto.getTimestamp())
                 .build();
     }
 
