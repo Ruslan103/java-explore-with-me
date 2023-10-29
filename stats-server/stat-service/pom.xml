@@ -27,7 +27,7 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>ru.practicum</groupId>
+            <groupId>ru.yandex.practicum</groupId>
             <artifactId>stat-dto</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
