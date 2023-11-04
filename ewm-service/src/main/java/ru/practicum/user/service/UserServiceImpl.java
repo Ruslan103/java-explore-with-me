@@ -1,7 +1,6 @@
 package ru.practicum.user.service;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.exception.NotFoundException;
@@ -10,12 +9,12 @@ import ru.practicum.user.dto.UserMapper;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
@@ -45,7 +44,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public void deleteUser(Long id) {
-        User user = userRepository.findById(id)
+        userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found"));
         userRepository.deleteById(id);
     }

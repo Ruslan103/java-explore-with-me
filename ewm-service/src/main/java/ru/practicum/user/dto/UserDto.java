@@ -1,5 +1,6 @@
 package ru.practicum.user.dto;
 
+
 import lombok.Builder;
 import lombok.Data;
 
