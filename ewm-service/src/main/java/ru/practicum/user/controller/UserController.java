@@ -19,7 +19,7 @@ import java.util.Collection;
 @RequestMapping(path = "/admin/users")
 @Validated
 public class UserController {
-    UserService userService;
+    private final UserService userService;
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
