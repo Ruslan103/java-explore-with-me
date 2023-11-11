@@ -15,7 +15,7 @@ public interface EventService {
 
     List<EventDto> getEventsByUserId(Long userId, Integer from, Integer size);
 
-    List<EventDto> getEventsByUserIdAndEventId(Long userId, Long eventId);
+    EventDto getEventByUserIdAndEventId(Long userId, Long eventId);
 
     EventDto updateEvent(Long userId, Long eventId, NewEventDto newEventDto);
 
@@ -40,7 +40,5 @@ public interface EventService {
                                         Integer size,
                                         HttpServletRequest request);
 
-    public EventDto getEventByIdPublic(Long id, HttpServletRequest request);
-
-
+    EventDto getEventByIdPublic(Long id, HttpServletRequest request);
 }

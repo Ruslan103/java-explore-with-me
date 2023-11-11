@@ -53,11 +53,9 @@ public class EventServiceImpl implements EventService {
 
 
     // GET/users/{userId}/events/{eventId}
-    public List<EventDto> getEventsByUserIdAndEventId(Long userId, Long eventId) {
+    public EventDto getEventByUserIdAndEventId(Long userId, Long eventId) {
         if (eventRepository.existsById(eventId)) {
-            return eventRepository.findEventsByIdAndInitiator(eventId, userId).stream()
-                    .map(EventMapper::toEventDto)
-                    .collect(Collectors.toList());
+            return EventMapper.toEventDto(eventRepository.findEventsByIdAndInitiator(eventId, userId));
         } else {
             throw new NotFoundException("Event not found");
         }

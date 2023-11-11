@@ -3,6 +3,7 @@ package ru.practicum.category.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.category.dto.CategoryDto;
@@ -26,7 +27,7 @@ public class CategoryPublicController {
     }
 
     @GetMapping("/{catId}")
-    public CategoryDto getCategoryById(Long catId) {
+    public CategoryDto getCategoryById(@PathVariable Long catId) {
         return categoryService.getCategoryById(catId);
     }
 }
