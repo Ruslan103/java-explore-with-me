@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.StatsClient;
 import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.dto.EndpointHitDto;
+import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.events.dto.*;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.StateEvent;
@@ -15,6 +16,7 @@ import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
 
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -26,7 +28,7 @@ import static ru.practicum.events.model.StateEvent.PUBLISHED;
 @Service
 @AllArgsConstructor
 //@RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class EventServiceImpl {
+public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
@@ -141,5 +143,36 @@ public class EventServiceImpl {
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());
     }
+
+    public EventDto getEventByIdPublic(Long id, HttpServletRequest request) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Event id=" + id + " not found!"));
+        if (!event.getState().equals(PUBLISHED)) {
+            throw new EntityNotFoundException("Event id=" + id + " not found!");
+        }
+        event.setViews(eventViews(event));
+        statsClient.addStats(EndpointHitDto.builder() // добавление в статистику
+                .uri(request.getRequestURI())
+                .app("ewm-main-service")
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.now())
+                .build());
+        return EventMapper.toEventDto(event);
+    }
+
+
+    private long eventViews(Event event) {
+        long views;
+        List<String> uri = List.of("/events/" + event.getId());
+        List<ViewStatsDto> viewStats = statsClient.getStats(event.getCreated(),
+                LocalDateTime.now(), uri, true);
+        if (viewStats.isEmpty()) {
+            return 0;
+        } else {
+            views = viewStats.get(0).getHits();
+        }
+        return views;
+    }
+
 
 }
