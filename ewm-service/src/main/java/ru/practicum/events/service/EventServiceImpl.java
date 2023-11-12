@@ -11,6 +11,7 @@ import ru.practicum.events.dto.*;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.StateEvent;
 import ru.practicum.events.repository.EventRepository;
+import ru.practicum.events.repository.LocationRepository;
 import ru.practicum.exception.DateException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.model.User;
@@ -19,8 +20,10 @@ import ru.practicum.user.repository.UserRepository;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static ru.practicum.events.model.StateEvent.PUBLISHED;
@@ -33,11 +36,13 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final StatsClient statsClient;
+    private final LocationRepository locationRepository;
 
     public EventDto addEvent(Long userId, NewEventDto newEventDto) {
         User initiator = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
         Event event = EventMapper.toEventFromNewEventDto(newEventDto, categoryRepository);
+        locationRepository.save(event.getLocation());
         event.setInitiator(initiator);
         event.setState(StateEvent.PENDING);
         return EventMapper.toEventDto(eventRepository.save(event));
@@ -46,7 +51,7 @@ public class EventServiceImpl implements EventService {
     // GET/users/{userId}/events
     public List<EventDto> getEventsByUserId(Long userId, Integer from, Integer size) {
         PageRequest page = PageRequest.of(from / size, size);
-        return eventRepository.findEventByInitiator(userId, page).stream()
+        return eventRepository.getEventByInitiator(userId, page).stream()
                 .map(EventMapper::toEventDto)
                 .collect(Collectors.toList());
     }
@@ -62,17 +67,34 @@ public class EventServiceImpl implements EventService {
     }
 
     // PATCH /users/{userId}/events/{eventId}
-    public EventDto updateEvent(Long userId, Long eventId, NewEventDto newEventDto) {
+    public EventDto updateEvent(Long userId, Long eventId, UpdateEventUser updateEventUser) {
         Event oldEvent = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
-        if (!oldEvent.getState().equals(PUBLISHED)) {
-            throw new NotFoundException("Event state is published");
+//        if (!oldEvent.getState().equals(PUBLISHED)) {
+//            throw new NotFoundException("Event state is published");
+//        }
+        Event updateEvent = EventMapper.toEventFromUpdateEvPrivate(updateEventUser,categoryRepository,eventRepository,eventId);
+        if (updateEvent.getAnnotation()==null){
+            updateEvent.setAnnotation(oldEvent.getAnnotation());
         }
-        Event updateEvent = EventMapper.toEventFromNewEventDto(newEventDto, categoryRepository);
-        updateEvent.setCreated(oldEvent.getCreated());
-        updateEvent.setInitiator(oldEvent.getInitiator());
-        updateEvent.setPublished(oldEvent.getPublished());
-        updateEvent.setState(oldEvent.getState());
+        if(updateEvent.getCategory()==null){
+            updateEvent.setCategory(oldEvent.getCategory());
+        }
+        if(updateEvent.getDescription()==null){
+            updateEvent.setDescription(oldEvent.getDescription());
+        }
+        if (updateEvent.getCreated()==null) {
+            updateEvent.setCreated(oldEvent.getCreated());
+        }
+        if (updateEvent.getInitiator()==null){
+            updateEvent.setInitiator(oldEvent.getInitiator());
+        }
+        if (updateEvent.getPublished()==null){
+            updateEvent.setPublished(oldEvent.getPublished());
+        }
+        if (updateEvent.getState()==null){
+            updateEvent.setState(oldEvent.getState());
+        }
         return EventMapper.toEventDto(updateEvent);
     }
 
@@ -103,16 +125,25 @@ public class EventServiceImpl implements EventService {
     // GET //events
     public List<EventShortDto> getEventsPublic(String text,
                                                List<Long> categories,
-                                               boolean paid,
+                                               String paidRequest,
                                                LocalDateTime rangeStart,
                                                LocalDateTime rangeEnd,
-                                               boolean onlyAvailable,
+                                               Boolean onlyAvailable,
                                                String sort,
                                                Integer from,
                                                Integer size,
                                                HttpServletRequest request) {
         PageRequest page = PageRequest.of(from / size, size);
-
+        Boolean paid = null;
+        if (paidRequest == null || text == null) {
+            return new ArrayList<>();
+        }
+        if (paidRequest.equals("false")) {
+            paid = false;
+        }
+        if (paidRequest.equals("true")) {
+            paid = true;
+        }
         if (rangeEnd != null && rangeStart != null) {
             if (rangeEnd.isBefore(rangeStart))
                 throw new DateException("Неверно указано время");
@@ -146,7 +177,7 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Event id=" + id + " not found!"));
         if (!event.getState().equals(PUBLISHED)) {
-            throw new EntityNotFoundException("Event id=" + id + " not found!");
+            throw new EntityNotFoundException("Event not found!");
         }
         event.setViews(eventViews(event));
         statsClient.addStats(EndpointHitDto.builder() // добавление в статистику
@@ -171,6 +202,4 @@ public class EventServiceImpl implements EventService {
         }
         return views;
     }
-
-
 }

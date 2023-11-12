@@ -14,7 +14,8 @@ import java.util.List;
 public interface EventRepository extends JpaRepository<Event, Long> {
     Boolean findEventByCategoryId(long catId);
 
-    List<Event> findEventByInitiator(Long userId, PageRequest page);
+    @Query("SELECT e FROM Event e WHERE e.initiator.id = ?1")
+    List<Event> getEventByInitiator(Long userId, PageRequest page);
 
     Event findEventsByIdAndInitiator(Long eventId, Long initiatorId);
 

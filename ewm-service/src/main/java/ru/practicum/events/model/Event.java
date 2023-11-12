@@ -23,7 +23,6 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String annotation;
-
     @JoinColumn(name = "category_id")
     @ManyToOne
     Category category;

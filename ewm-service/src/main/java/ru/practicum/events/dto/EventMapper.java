@@ -1,6 +1,7 @@
 package ru.practicum.events.dto;
 
 import ru.practicum.category.dto.CategoryMapper;
+import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.StateAction;
@@ -67,7 +68,46 @@ public class EventMapper {
                 .title(newEventDto.getTitle())
                 .build();
     }
-
+public static Event toEventFromUpdateEvPrivate(UpdateEventUser updateEventUser,
+                                               CategoryRepository categoryRepository,
+                                               EventRepository eventRepository,
+                                               Long eventId){
+    Event event = eventRepository.findById(eventId)
+            .orElseThrow(() -> new NotFoundException("Event not found"));
+    StateEvent stateEvent = event.getState();
+//    if (stateEvent.equals(StateEvent.PENDING)) {
+//        if (updateEventUser.getStateAction().equals(StateAction.REJECT_EVENT)) {
+//            stateEvent = StateEvent.CANCELED;
+//        }
+//        if (updateEventUser.getStateAction().equals(StateAction.PUBLISH_EVENT)) {
+//            stateEvent = StateEvent.PUBLISHED;
+//        }
+//    } else {
+//        throw new UpdateException("Invalid state");
+//    }
+    Long categoryId = updateEventUser.getCategory();
+    Category category = null;
+    if (categoryId != null) {
+        category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new NotFoundException("Category not found"));
+    }
+    return Event.builder()
+            .id(eventId)
+            .annotation(updateEventUser.getAnnotation())
+            .category(category)
+            .description(updateEventUser.getDescription())
+            .eventDate(updateEventUser.getEventDate())
+            .location(updateEventUser.getLocation())
+            .paid(updateEventUser.getPaid())
+            .participantLimit(updateEventUser.getParticipantLimit())
+            .requestModeration(updateEventUser.getRequestModeration())
+            .title(updateEventUser.getTitle())
+            .state(stateEvent)
+            .created(event.getCreated())
+            .initiator(event.getInitiator())
+            .published(event.getPublished())
+            .build();
+}
     public static Event toEventFromUpdateEvAdmin(UpdateEventAdmin updateEventAdmin,
                                                  CategoryRepository categoryRepository,
                                                  EventRepository eventRepository,
@@ -83,14 +123,18 @@ public class EventMapper {
                 stateEvent = StateEvent.PUBLISHED;
             }
         } else {
-            throw new UpdateException("State of event do not have permission to update");
+            throw new UpdateException("Invalid state");
         }
-
+        Long categoryId = updateEventAdmin.getCategory();
+        Category category = null;
+        if (categoryId != null) {
+            category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new NotFoundException("Category not found"));
+        }
         return Event.builder()
                 .id(eventId)
                 .annotation(updateEventAdmin.getAnnotation())
-                .category(categoryRepository.findById(updateEventAdmin.getCategory())
-                        .orElseThrow(() -> new NotFoundException("Category not found")))
+                .category(category)
                 .description(updateEventAdmin.getDescription())
                 .eventDate(updateEventAdmin.getEventDate())
                 .location(updateEventAdmin.getLocation())

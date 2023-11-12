@@ -17,8 +17,6 @@ public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    @Column(name = "lon")
     Float lon;
-    @Column(name = "lat")
     Float lat;
 }
