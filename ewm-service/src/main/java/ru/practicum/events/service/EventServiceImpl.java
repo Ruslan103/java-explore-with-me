@@ -9,11 +9,14 @@ import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.events.dto.*;
 import ru.practicum.events.model.Event;
+import ru.practicum.events.model.Location;
+import ru.practicum.events.model.StateAction;
 import ru.practicum.events.model.StateEvent;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.events.repository.LocationRepository;
 import ru.practicum.exception.DateException;
 import ru.practicum.exception.NotFoundException;
+import ru.practicum.request.reposytory.RequestRepository;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
 
@@ -37,6 +40,7 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final StatsClient statsClient;
     private final LocationRepository locationRepository;
+    private final RequestRepository requestRepository;
 
     public EventDto addEvent(Long userId, NewEventDto newEventDto) {
         User initiator = userRepository.findById(userId)
@@ -68,33 +72,64 @@ public class EventServiceImpl implements EventService {
 
     // PATCH /users/{userId}/events/{eventId}
     public EventDto updateEvent(Long userId, Long eventId, UpdateEventUser updateEventUser) {
-        Event oldEvent = eventRepository.findById(eventId)
+        Event updateEvent = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
+        //     Event testEvent=eventRepository.getReferenceById(eventId);
 //        if (!oldEvent.getState().equals(PUBLISHED)) {
 //            throw new NotFoundException("Event state is published");
 //        }
-        Event updateEvent = EventMapper.toEventFromUpdateEvPrivate(updateEventUser,categoryRepository,eventRepository,eventId);
-        if (updateEvent.getAnnotation()==null){
-            updateEvent.setAnnotation(oldEvent.getAnnotation());
+      //  Event updateEvent = EventMapper.toEventFromUpdateEvPrivate(updateEventUser, categoryRepository, eventRepository, eventId);
+//        if (updateEventUser.getAnnotation() != null) {
+//            updateEvent.setAnnotation(updateEventUser.getAnnotation());
+//        }
+//        if (updateEventUser.getDescription() != null) {
+//            updateEvent.setDescription(updateEventUser.getDescription());
+//        }
+//        if (updateEventUser.getTitle() != null) {
+//            updateEvent.setTitle(updateEventUser.getTitle());
+//        }
+        if (updateEvent.getAnnotation() != null) {
+            updateEvent.setAnnotation(updateEvent.getAnnotation());
         }
-        if(updateEvent.getCategory()==null){
-            updateEvent.setCategory(oldEvent.getCategory());
+
+        if (updateEvent.getDescription() != null) {
+            updateEvent.setDescription(updateEvent.getDescription());
         }
-        if(updateEvent.getDescription()==null){
-            updateEvent.setDescription(oldEvent.getDescription());
+        if (updateEvent.getEventDate() != null) {
+            //validDate(updateEvent.getEventDate());
+            updateEvent.setEventDate(updateEvent.getEventDate());
         }
-        if (updateEvent.getCreated()==null) {
-            updateEvent.setCreated(oldEvent.getCreated());
+        if (updateEvent.getPaid() != null) {
+            updateEvent.setPaid(updateEvent.getPaid());
         }
-        if (updateEvent.getInitiator()==null){
-            updateEvent.setInitiator(oldEvent.getInitiator());
+        if (updateEvent.getParticipantLimit() != null) {
+            updateEvent.setParticipantLimit(updateEvent.getParticipantLimit());
         }
-        if (updateEvent.getPublished()==null){
-            updateEvent.setPublished(oldEvent.getPublished());
+        if (updateEvent.getRequestModeration() != null) {
+            updateEvent.setRequestModeration(updateEvent.getRequestModeration());
         }
-        if (updateEvent.getState()==null){
-            updateEvent.setState(oldEvent.getState());
+        if (updateEvent.getTitle() != null) {
+            updateEvent.setTitle(updateEvent.getTitle());
         }
+        if (updateEvent.getState() != null) {
+            if (updateEventUser.getStateAction() == StateAction.CANCEL_REVIEW) {
+                updateEvent.setState(StateEvent.CANCELED);
+            }
+            if (updateEventUser.getStateAction() == StateAction.SEND_TO_REVIEW) {
+                updateEvent.setState(StateEvent.PENDING);
+            }
+        }
+        if (updateEvent.getLocation() != null) {
+            Location location = locationRepository.save(updateEvent.getLocation());
+            updateEvent.setLocation(location);
+        }
+//        updateEvent.setCreated(oldEvent.getCreated());
+//        updateEvent.setInitiator(oldEvent.getInitiator());
+//        updateEvent.setPublished(oldEvent.getPublished());
+//        updateEvent.setState(oldEvent.getState());
+        eventRepository.save(updateEvent);
+        EventDto eventDto = EventMapper.toEventDto(updateEvent);
+//        eventDto.setConfirmedRequests(requestRepository.getConfirmedRequestsByEventId(eventDto.getId()));
         return EventMapper.toEventDto(updateEvent);
     }
 
