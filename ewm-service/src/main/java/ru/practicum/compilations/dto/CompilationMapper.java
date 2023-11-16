@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class CompilationMapper {
 
-    public static Compilation toEntity(NewCompilationDto dto) {
+    public static Compilation toCompilation(NewCompilationDto dto) {
         return Compilation.builder()
                 .title(dto.getTitle())
                 .pinned(dto.getPinned())
@@ -17,16 +17,7 @@ public class CompilationMapper {
 
     }
 
-    public static Compilation toEntity(CompilationDto dto) {
-        return Compilation.builder()
-                .title(dto.getTitle())
-                .pinned(dto.getPinned())
-                .build();
-
-    }
-
-
-    public static CompilationDto toDto(Compilation model) {
+    public static CompilationDto toCompilationDto(Compilation model) {
         CompilationDto result = CompilationDto.builder()
                 .id(model.getId())
                 .pinned(model.getPinned())
@@ -35,7 +26,7 @@ public class CompilationMapper {
         if (model.getEvents() != null) {
             result.setEvents(model.getEvents()
                     .stream()
-                    .map(EventMapper::toEventShortDto)
+                    .map(EventMapper::toShortDto)
                     .collect(Collectors.toList()));
         } else {
             result.setEvents(new ArrayList<>());

@@ -20,13 +20,19 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     @Query("SELECT COUNT(r.id) " +
             "FROM Request AS r " +
-            "WHERE r.event.id = ?1" +
+            "WHERE r.event.id = :eventId " +
             "AND r.state = 'CONFIRMED' ")
     Integer getConfirmedRequestsByEventId(Long eventId);
 
     @Query("SELECT COUNT(r.id) " +
             "FROM Request AS r " +
-            "WHERE r.event.id IN ?1" +
+            "WHERE r.event.id IN :eventIds " +
             "AND r.state = 'CONFIRMED' ")
     List<Integer> getConfirmedRequestsByListOfEvents(List<Long> eventIds);
+
+
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END " +
+            "FROM Request r " +
+            "WHERE r.event.id = ?1 AND r.requester.id = ?2")
+    boolean existsByEventIdAndRequesterId(Long eventId, Long requesterId);
 }

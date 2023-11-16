@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.events.dto.EventDto;
+import ru.practicum.events.dto.EventShortDto;
 import ru.practicum.events.dto.NewEventDto;
 import ru.practicum.events.dto.UpdateEventUser;
 import ru.practicum.events.service.EventService;
@@ -17,6 +18,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -34,29 +36,28 @@ public class EventControllerPrivate {
     }
 
     @GetMapping
-    Collection<EventDto> getEventsByUserId(@PathVariable Long userId,
-                                           @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
-                                           @RequestParam(defaultValue = "10") @Positive Integer size) {
-
-        return service.getEventsByUserId(userId, from, size);
+    List<EventShortDto> getEventsByUser(@PathVariable Long userId,
+                                        @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                        @RequestParam(defaultValue = "10") @Positive Integer size) {
+        return service.getEventsByUser(userId, from, size);
     }
 
     @GetMapping("/{eventId}")
-    EventDto getEventByUserIdAndEventId(@PathVariable Long userId,
-                                        @PathVariable Long eventId) {
-        return service.getEventByUserIdAndEventId(userId, eventId);
+    EventDto getEventById(@PathVariable Long userId,
+                          @PathVariable Long eventId) {
+        return service.getEventById(userId, eventId);
     }
 
 
     @PatchMapping("/{eventId}")
-    EventDto updateEvent(@PathVariable Long userId,
-                         @PathVariable Long eventId,
-                         @RequestBody @Valid UpdateEventUser updateEventUser) {
-        return service.updateEvent(userId, eventId, updateEventUser);
+    EventDto updateEventByUser(@PathVariable Long userId,
+                               @PathVariable Long eventId,
+                               @RequestBody @Valid UpdateEventUser updateEvent) {
+        return service.updateEvent(userId, eventId, updateEvent);
     }
 
     @GetMapping("/{eventId}/requests")
-    Collection<ParticipationRequestDto> getRequestsForEvent(@PathVariable Long userId,
+    List<ParticipationRequestDto> getRequestsForEvent(@PathVariable Long userId,
                                                             @PathVariable Long eventId) {
         return requestService.getRequestsForEvent(userId, eventId);
     }

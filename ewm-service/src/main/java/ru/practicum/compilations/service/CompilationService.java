@@ -6,6 +6,7 @@ import ru.practicum.compilations.dto.NewCompilationDto;
 import ru.practicum.compilations.dto.UpdateCompilationRequest;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface CompilationService {
     CompilationDto addCompilation(NewCompilationDto dto);
@@ -14,7 +15,7 @@ public interface CompilationService {
 
     CompilationDto updateCompilation(Long compId, UpdateCompilationRequest request);
 
-    Collection<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size);
+    List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size);
 
     CompilationDto getCompilationById(Long compId);
 }

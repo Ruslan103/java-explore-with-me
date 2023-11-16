@@ -3,52 +3,61 @@ package ru.practicum.events.repository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.StateEvent;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
-    Boolean findEventByCategoryId(long catId);
 
-    @Query("SELECT e FROM Event e WHERE e.initiator.id = ?1")
-    List<Event> getEventByInitiator(Long userId, PageRequest page);
+    @Query("select e " +
+            "from Event AS e " +
+            "JOIN FETCH e.initiator " +
+            "JOIN FETCH e.category " +
+            "JOIN FETCH e.location " +
+            "where e.initiator.id = :userId"
+    )
+    List<Event> getEventsByUser(Long userId, PageRequest page);
 
-    Event findEventsByIdAndInitiator(Long eventId, Long initiatorId);
+    @Query("select e " +
+            "from Event AS e " +
+            "JOIN FETCH e.initiator " +
+            "JOIN FETCH e.category " +
+            "WHERE (cast(:rangeStart as timestamp) IS NULL OR e.eventDate >= :rangeStart) " +
+            "AND (cast(:rangeEnd as timestamp) IS NULL OR e.eventDate <= :rangeEnd) " +
+            "and (:users is null or e.initiator.id in :users) " +
+            "and (:categories is null or e.category.id in :categories) " +
+            "and (:states is null or e.state in :states)")
+    List<Event> findAllAdmin(@Param("users") List<Long> users,
+                             @Param("states") List<StateEvent> states,
+                             @Param("categories") List<Long> categories,
+                             @Param("rangeStart") LocalDateTime rangeStart,
+                             @Param("rangeEnd") LocalDateTime rangeEnd,
+                             PageRequest page);
 
-    @Query("SELECT e " +
-            "FROM Event AS e " +
-            "WHERE e.initiator.id IN ?1 " +
-            "AND e.state IN ?2 " +
-            "AND e.category.id IN ?3 " +
-            "AND e.eventDate >= ?4 " +
-            "AND e.eventDate <= ?5")
-    List<Event> getEventsAdmin(List<Long> usersId,
-                               List<StateEvent> states,
-                               List<Long> categories,
-                               LocalDateTime rangeStart,
-                               LocalDateTime rangeEnd,
-                               PageRequest page);
+    @Query("select e " +
+            "from Event AS e " +
+            "JOIN FETCH e.initiator " +
+            "JOIN FETCH e.category " +
+            "where e.state = 'PUBLISHED' " +
+            "AND (cast(:rangeStart as timestamp) IS NULL OR e.eventDate >= :rangeStart) " +
+            "AND (cast(:rangeEnd as timestamp) IS NULL OR e.eventDate <= :rangeEnd) " +
+            "and (:categories is null or e.category.id in :categories) " +
+            "and (:paid is null or e.paid = :paid) " +
+            "and (:text is null or (upper(e.annotation) like upper(concat('%', :text, '%'))) " +
+            "or (upper(e.description) like upper(concat('%', :text, '%')))" +
+            "or (upper(e.title) like upper(concat('%', :text, '%'))))")
+    List<Event> findAllPublishState(LocalDateTime rangeStart,
+                                    LocalDateTime rangeEnd,
+                                    List<Long> categories,
+                                    Boolean paid,
+                                    String text,
+                                    PageRequest page);
 
-
-    @Query("SELECT e " +
-            "FROM Event AS e " +
-            "WHERE UPPER(e.annotation) LIKE UPPER(?1) " +
-            "OR UPPER(e.description) LIKE UPPER(?1) " +
-            "OR UPPER(e.title) LIKE UPPER(?1) " +
-            "AND e.category.id IN ?2 " +
-            "AND e.paid = ?3 " +
-            "AND e.eventDate >= ?4 " +
-            "AND e.eventDate <= ?5 " +
-            "AND (false = ?6 OR (true = ?6 and e.participantLimit > 0))")
-    List<Event> getEventsPublic(String text,
-                                List<Long> categories,
-                                Boolean paid,
-                                LocalDateTime rangeStart,
-                                LocalDateTime rangeEnd,
-                                Boolean onlyAvailable,
-                                PageRequest pageRequest);
+    Collection<Event> findAllByCategoryId(Long id);
 }

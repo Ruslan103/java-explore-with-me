@@ -1,34 +1,36 @@
 package ru.practicum.category.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.category.service.CategoryService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/admin/categories")
-@Validated
 public class CategoryAdminController {
-    private final CategoryService categoryService;
+    private final CategoryService service;
 
     @PostMapping
-    public CategoryDto addCategory(@Valid @RequestBody CategoryDto categoryDto) {
-        return categoryService.addCategory(categoryDto);
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public CategoryDto addCategory(@RequestBody @Valid CategoryDto categoryDto) {
+        return service.addCategory(categoryDto);
     }
 
     @DeleteMapping("/{catId}")
-    public void deleteCategory(@Positive @PathVariable Long catId) {
-        categoryService.deleteCategory(catId);
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void deleteCategory(@PathVariable Long catId) {
+        service.deleteCategoryById(catId);
     }
 
     @PatchMapping("/{catId}")
-    public CategoryDto updateCategory(@Positive @PathVariable Long catId,
-                                      @Valid @RequestBody CategoryDto categoryDto) {
-        return categoryService.updateCategory(catId, categoryDto);
+    public CategoryDto updateCategory(@PathVariable Long catId, @Valid @RequestBody CategoryDto categoryDto) {
+
+        return service.updateCategoryById(catId, categoryDto);
+
     }
+
 }

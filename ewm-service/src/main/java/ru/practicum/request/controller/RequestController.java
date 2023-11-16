@@ -8,6 +8,7 @@ import ru.practicum.request.dto.ParticipationRequestDto;
 import ru.practicum.request.service.RequestService;
 
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -16,7 +17,7 @@ public class RequestController {
     private final RequestService requestService;
 
     @GetMapping
-    public Collection<ParticipationRequestDto> getParticipationRequest(@PathVariable Long userId) {
+    public List<ParticipationRequestDto> getParticipationRequest(@PathVariable Long userId) {
 
         return requestService.getRequestsById(userId);
     }
@@ -25,7 +26,7 @@ public class RequestController {
     @ResponseStatus(value = HttpStatus.CREATED)
     public ParticipationRequestDto saveParticipationRequest(@PathVariable Long userId,
                                                             @RequestParam Long eventId) {
-        return requestService.saveRequest(userId, eventId);
+        return requestService.addRequest(userId, eventId);
     }
 
     @PatchMapping("/{requestId}/cancel")

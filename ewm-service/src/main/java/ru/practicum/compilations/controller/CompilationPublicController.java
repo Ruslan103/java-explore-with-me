@@ -8,18 +8,18 @@ import ru.practicum.compilations.service.CompilationService;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/compilations")
 @AllArgsConstructor
-public class CompilationControllerPublic {
+public class CompilationPublicController {
     private final CompilationService service;
 
     @GetMapping
-    Collection<CompilationDto> getCompilations(@RequestParam(required = false) boolean pinned,
-                                               @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
-                                               @RequestParam(defaultValue = "10") @Positive Integer size) {
+    List<CompilationDto> getCompilations(@RequestParam(required = false) boolean pinned,
+                                         @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                         @RequestParam(defaultValue = "10") @Positive Integer size) {
         return service.getCompilations(pinned, from, size);
     }
 

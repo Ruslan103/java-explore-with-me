@@ -6,8 +6,9 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.compilations.model.Compilation;
 
 import java.util.Collection;
+import java.util.List;
 
 @Repository
 public interface CompilationRepository extends JpaRepository<Compilation, Long> {
-    Collection<Compilation> findAllByPinned(Boolean pinned, PageRequest page);
+    List<Compilation> findAllByPinned(Boolean pinned, PageRequest page);
 }

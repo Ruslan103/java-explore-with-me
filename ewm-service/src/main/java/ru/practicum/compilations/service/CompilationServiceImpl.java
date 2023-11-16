@@ -12,20 +12,19 @@ import ru.practicum.compilations.model.Compilation;
 import ru.practicum.compilations.repository.CompilationRepository;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.repository.EventRepository;
+import ru.practicum.exception.NotFoundException;
 
-import javax.persistence.EntityNotFoundException;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class CompilationServiceImpl implements CompilationService {
-    private final CompilationRepository repository;
+    private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
 
     public CompilationDto addCompilation(NewCompilationDto dto) {
-        Compilation compilation = CompilationMapper.toEntity(dto);
+        Compilation compilation = CompilationMapper.toCompilation(dto);
         if (dto.getEvents() != null) {
             List<Event> events = eventRepository.findAllById(dto.getEvents());
             compilation.setEvents(events);
@@ -33,21 +32,19 @@ public class CompilationServiceImpl implements CompilationService {
         if (dto.getPinned() == null) {
             compilation.setPinned(false);
         }
-        return CompilationMapper.toDto(repository.save(compilation));
+        return CompilationMapper.toCompilationDto(compilationRepository.save(compilation));
     }
 
-    @Override
     public void deleteCompilation(Long compId) {
-        Compilation compilation = repository.findById(compId)
-                .orElseThrow(() -> new EntityNotFoundException("Подборка с id=" + compId + " не найдена"));
-        repository.delete(compilation);
+        Compilation compilation = compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Compilation not found"));
+        compilationRepository.delete(compilation);
 
     }
 
-    @Override
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest request) {
-        Compilation compilation = repository.findById(compId)
-                .orElseThrow(() -> new EntityNotFoundException("Подборка с id=" + compId + " не найдена"));
+        Compilation compilation = compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Compilation not found"));
         if (request.getPinned() != null) {
             compilation.setPinned(request.getPinned());
         }
@@ -58,30 +55,26 @@ public class CompilationServiceImpl implements CompilationService {
             List<Event> events = eventRepository.findAllById(request.getEvents());
             compilation.setEvents(events);
         }
-        return CompilationMapper.toDto(repository.save(compilation));
+        return CompilationMapper.toCompilationDto(compilationRepository.save(compilation));
     }
 
-    @Override
-    public Collection<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
-
+    public List <CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
         PageRequest page = PageRequest.of(from / size, size);
         if (pinned == null) {
-            return repository.findAll(page)
+            return compilationRepository.findAll(page)
                     .stream()
-                    .map(CompilationMapper::toDto)
+                    .map(CompilationMapper::toCompilationDto)
                     .collect(Collectors.toList());
         } else {
-            return repository.findAllByPinned(pinned, page)
+            return compilationRepository.findAllByPinned(pinned, page)
                     .stream()
-                    .map(CompilationMapper::toDto)
+                    .map(CompilationMapper::toCompilationDto)
                     .collect(Collectors.toList());
-
         }
     }
 
-    @Override
     public CompilationDto getCompilationById(Long compId) {
-        return CompilationMapper.toDto(repository.findById(compId)
-                .orElseThrow(() -> new EntityNotFoundException("Подборка с id=" + compId + " не найдена")));
+        return CompilationMapper.toCompilationDto(compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Compilation not found")));
     }
 }

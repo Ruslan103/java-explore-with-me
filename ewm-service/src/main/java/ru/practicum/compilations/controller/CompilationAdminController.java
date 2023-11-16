@@ -14,25 +14,25 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/admin/compilations")
 @AllArgsConstructor
-public class CompilationControllerAdmin {
-    private final CompilationService service;
+public class CompilationAdminController {
+    private final CompilationService compilationService;
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
     CompilationDto addCompilation(@RequestBody @Valid NewCompilationDto dto) {
-        return service.addCompilation(dto);
+        return compilationService.addCompilation(dto);
     }
 
     @DeleteMapping("/{compId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deleteCompile(@PathVariable Long compId) {
-        service.deleteCompilation(compId);
+        compilationService.deleteCompilation(compId);
     }
 
     @PatchMapping("/{compId}")
     CompilationDto updateCompilation(@PathVariable Long compId,
                                      @RequestBody @Valid UpdateCompilationRequest request) {
-        return service.updateCompilation(compId, request);
+        return compilationService.updateCompilation(compId, request);
     }
 }
 
