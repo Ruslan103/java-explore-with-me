@@ -53,14 +53,14 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto updateCategoryById(Long id, CategoryDto categoryDto) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
-        if (categoryRepository.existsByName(categoryDto.getName())&&!(category.getName().equals(categoryDto.getName())&&!categoryDto.getName().isEmpty())) {
+        if (categoryRepository.existsByName(categoryDto.getName()) && !(category.getName().equals(categoryDto.getName()) && !categoryDto.getName().isEmpty())) {
             throw new UpdateException("This name exist");
         }
         category.setName(categoryDto.getName());
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
-    public List <CategoryDto> getCategories(int from, int size) {
+    public List<CategoryDto> getCategories(int from, int size) {
         PageRequest page = PageRequest.of(from / size, size);
         List<Category> list = categoryRepository.findAll(page).getContent();
 

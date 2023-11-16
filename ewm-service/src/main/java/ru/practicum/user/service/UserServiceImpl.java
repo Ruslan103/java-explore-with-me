@@ -10,7 +10,6 @@ import ru.practicum.user.dto.UserMapper;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,7 +20,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     public UserDto addUser(UserDto userDto) {
-        if (userRepository.existsByName(userDto.getName())){
+        if (userRepository.existsByName(userDto.getName())) {
             throw new UpdateException("Name exist");
         }
         User user = UserMapper.toUser(userDto);

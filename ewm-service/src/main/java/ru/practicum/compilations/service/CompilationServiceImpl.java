@@ -58,7 +58,7 @@ public class CompilationServiceImpl implements CompilationService {
         return CompilationMapper.toCompilationDto(compilationRepository.save(compilation));
     }
 
-    public List <CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
+    public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
         PageRequest page = PageRequest.of(from / size, size);
         if (pinned == null) {
             return compilationRepository.findAll(page)

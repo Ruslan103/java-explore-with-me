@@ -17,7 +17,6 @@ import ru.practicum.request.service.RequestService;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -58,7 +57,7 @@ public class EventControllerPrivate {
 
     @GetMapping("/{eventId}/requests")
     List<ParticipationRequestDto> getRequestsForEvent(@PathVariable Long userId,
-                                                            @PathVariable Long eventId) {
+                                                      @PathVariable Long eventId) {
         return requestService.getRequestsForEvent(userId, eventId);
     }
 
