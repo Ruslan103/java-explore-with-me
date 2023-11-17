@@ -10,7 +10,7 @@ services:
       - "9090:9090"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stat-db:5432/stats-db
-      - POSTGRES_USER=postgres
+      - POSTGRES_USER=stats-db
       - POSTGRES_PASSWORD=1234
 
   stat-db:
