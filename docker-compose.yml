@@ -19,7 +19,7 @@ services:
     ports:
       - "6541:5432"
     environment:
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=stats-db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=1234
 
@@ -34,7 +34,7 @@ services:
       - "8080:8080"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://main-db:5432/main-db
-      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_USERNAME=main-db
       - SPRING_DATASOURCE_PASSWORD=1234
 
   main-db:
@@ -43,6 +43,6 @@ services:
     ports:
       - "6542:5432"
     environment:
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=main-db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=1234
