@@ -174,7 +174,7 @@ public class EventServiceImpl implements EventService {
         }
         if (rangeEnd != null && rangeStart != null) {
             if (rangeEnd.isBefore(rangeStart))
-                throw new DateException("Date incorrect");
+                throw new DateException("Конфликт временной выборки");
         }
         List<Event> events;
         if (sort.equals("EVENT_DATE")) {
@@ -185,11 +185,10 @@ public class EventServiceImpl implements EventService {
                 paid, text, page);
         if (onlyAvailable) {
             events = events.stream()
-                    .filter(event -> !requestRepository.getConfirmedRequestsByEventId(event.getId())
-                            .equals(event.getParticipantLimit())).collect(Collectors.toList());
+                    .filter(event -> !requestRepository.getConfirmedRequestsByEventId(event.getId()).equals(event.getParticipantLimit())).collect(Collectors.toList());
         }
-        views(events, statsClient);
-        saveStats(request);
+        views(events, statsClient);  // добавил просмотры
+        saveStats(request);     // сохранил запрос в сервер статистики
         List<EventShortDto> result = events.stream()
                 .map(EventMapper::toShortDto)
                 .collect(Collectors.toList());
@@ -198,14 +197,7 @@ public class EventServiceImpl implements EventService {
                     .sorted(Comparator.comparingLong(EventShortDto::getViews).reversed())
                     .collect(Collectors.toList());
         }
-        List<Integer> requestsCount = requestRepository.getConfirmedRequestsByListOfEvents(result
-                .stream()
-                .map(EventShortDto::getId)
-                .collect(Collectors.toList()));
-
-        for (int i = 0; i < requestsCount.size(); i++) {
-            result.get(i).setConfirmedRequests(requestsCount.get(i));
-        }
+        setConfirmedRequests(result, requestRepository);
         return result;
     }
 
