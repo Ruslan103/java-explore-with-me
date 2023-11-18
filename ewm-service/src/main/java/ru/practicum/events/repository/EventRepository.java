@@ -52,11 +52,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "and (:text is null or (upper(e.annotation) like upper(concat('%', :text, '%'))) " +
             "or (upper(e.description) like upper(concat('%', :text, '%')))" +
             "or (upper(e.title) like upper(concat('%', :text, '%'))))")
-    List<Event> findAllPublishState(LocalDateTime rangeStart,
-                                    LocalDateTime rangeEnd,
-                                    List<Long> categories,
-                                    Boolean paid,
-                                    String text,
+    List<Event> findAllPublishState(@Param("rangeStart") LocalDateTime rangeStart,
+                                    @Param("rangeEnd") LocalDateTime rangeEnd,
+                                    @Param("categories") List<Long> categories,
+                                    @Param("paid") Boolean paid,
+                                    @Param("text") String text,
                                     PageRequest page);
 
     Collection<Event> findAllByCategoryId(Long id);
