@@ -33,6 +33,6 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END " +
             "FROM Request r " +
-            "WHERE r.event.id = ?1 AND r.requester.id = ?2")
-    boolean existsByEventIdAndRequesterId(Long eventId, Long requesterId);
+            "WHERE r.event.id = :eventId AND r.requester.id = :requesterId")
+    boolean existsByEventIdAndRequesterId(@Param("eventId") Long eventId, @Param("requesterId") Long requesterId);
 }
