@@ -21,32 +21,32 @@ import java.time.LocalDateTime;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String annotation;
+    private Long id;
+    private String annotation;
     @JoinColumn(name = "category_id")
     @ManyToOne
-    Category category;
-    String description;
+    private Category category;
+    private String description;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "event_date")
-    LocalDateTime eventDate;
+    private LocalDateTime eventDate;
     @ManyToOne
     @JoinColumn(name = "location_id")
-    Location location;
-    Boolean paid;
-    Integer participantLimit;
-    Boolean requestModeration;
-    String title;
+    private Location location;
+    private Boolean paid;
+    private Integer participantLimit;
+    private Boolean requestModeration;
+    private String title;
     @Enumerated(EnumType.STRING)
-    StateEvent state;
+    private StateEvent state;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @CreationTimestamp
-    LocalDateTime created;
+    private LocalDateTime created;
     @ManyToOne
     @JoinColumn(name = "initiator_id")
-    User initiator;
+    private User initiator;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime published;
+    private LocalDateTime published;
     @Transient
-    Long views;
+    private Long views;
 }

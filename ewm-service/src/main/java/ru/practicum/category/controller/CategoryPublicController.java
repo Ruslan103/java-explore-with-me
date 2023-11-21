@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping(path = "/categories")
 @Validated
 public class CategoryPublicController {
-    CategoryService categoryService;
+    private final CategoryService categoryService;
 
     @GetMapping
     List<CategoryDto> getAll(@RequestParam(value = "from", defaultValue = "0")
