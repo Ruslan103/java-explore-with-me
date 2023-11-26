@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
+import ru.practicum.exception.DateException;
 import ru.practicum.mapper.HitMapper;
 import ru.practicum.model.Hit;
 import ru.practicum.repository.HitRepository;
@@ -31,11 +32,12 @@ public class HitServiceImpl implements HitService {
                                        LocalDateTime end,
                                        List<String> uris,
                                        boolean unique) {
-        log.info("getStats method call");
+        if (start == null || end == null || start.isAfter(end)) {
+            throw new DateException("Date incorrect");
+        }
         List<ViewStatsDto> s;
         if (unique) {
             if (uris.isEmpty()) {
-
                 s = hitRepository.getUniqueStats(start, end);
             } else {
                 s = hitRepository.getUniqueStatWithUris(start, end, uris);
@@ -43,7 +45,6 @@ public class HitServiceImpl implements HitService {
         } else {
             if (uris.isEmpty()) {
                 s = hitRepository.getAllStats(start, end);
-
             } else {
                 s = hitRepository.getStatWithUrisAndDate(start, end, uris);
             }
