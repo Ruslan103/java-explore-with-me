@@ -55,9 +55,8 @@ public class LikeServiceImpl implements LikeService {
     }
 
     public List<Like> getLikesByComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NotFoundException("Comment not found."));
-
+        commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("Comment not found"));
         return likeCommentRepository.findAllByCommentId(commentId);
     }
 }
